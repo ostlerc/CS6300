@@ -1,4 +1,5 @@
 #include "NotExpression.hpp"
+#include "LiteralExpression.hpp"
 
 cs6300::NotExpression::NotExpression(
   std::shared_ptr<Expression> expr)
@@ -8,6 +9,9 @@ cs6300::NotExpression::NotExpression(
 
 std::shared_ptr<cs6300::BasicBlock> cs6300::NotExpression::emit() const
 {
+    if(isConst())
+        return LiteralExpression(value()).emit();
+
   auto result = m_expr->emit();
   result->instructions.emplace_back(
       ThreeAddressInstruction::Not, getLabel(), m_expr->getLabel(), 0);
@@ -17,6 +21,6 @@ std::shared_ptr<cs6300::Type> cs6300::NotExpression::type() const
 {
   return nullptr;
 }
-int cs6300::NotExpression::value() const { return 0; }
-bool cs6300::NotExpression::isConst() const { return false; }
+int cs6300::NotExpression::value() const { return !m_expr->value(); }
+bool cs6300::NotExpression::isConst() const { return m_expr->isConst(); }
 

@@ -1,4 +1,6 @@
 #include "LtExpression.hpp"
+#include "LiteralExpression.hpp"
+
 cs6300::LtExpression::LtExpression (std::shared_ptr<Expression> lhs,
                                                std::shared_ptr<Expression> rhs)
   : m_lhs(lhs)
@@ -8,8 +10,10 @@ cs6300::LtExpression::LtExpression (std::shared_ptr<Expression> lhs,
 
 std::shared_ptr<cs6300::BasicBlock> cs6300::LtExpression::emit() const
 {
-  return emitBinaryOp(
-      ThreeAddressInstruction::IsLess, getLabel(), m_lhs, m_rhs);
+    if(isConst())
+        return LiteralExpression(value()).emit();
+    return emitBinaryOp(
+            ThreeAddressInstruction::IsLess, getLabel(), m_lhs, m_rhs);
 }
 
 std::shared_ptr<cs6300::Type> cs6300::LtExpression::type() const

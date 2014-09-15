@@ -1,4 +1,6 @@
 #include "EqExpression.hpp"
+#include "LiteralExpression.hpp"
+
 cs6300::EqExpression::EqExpression (std::shared_ptr<Expression> lhs,
                                                std::shared_ptr<Expression> rhs)
   : m_lhs(lhs)
@@ -8,6 +10,8 @@ cs6300::EqExpression::EqExpression (std::shared_ptr<Expression> lhs,
 
 std::shared_ptr<cs6300::BasicBlock> cs6300::EqExpression::emit() const
 {
+    if(isConst())
+        return LiteralExpression(value()).emit();
   return emitBinaryOp(ThreeAddressInstruction::IsEqual,getLabel(),m_lhs,m_rhs);
 }
 

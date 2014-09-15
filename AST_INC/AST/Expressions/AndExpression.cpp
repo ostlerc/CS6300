@@ -1,6 +1,7 @@
 #include "AndExpression.hpp"
 #include "AST/BasicBlock.hpp"
 #include "AST/ThreeAddressInstruction.hpp"
+#include "LiteralExpression.hpp"
 
 cs6300::AndExpression::AndExpression (std::shared_ptr<Expression> lhs,
                                                std::shared_ptr<Expression> rhs)
@@ -11,6 +12,8 @@ cs6300::AndExpression::AndExpression (std::shared_ptr<Expression> lhs,
 
 std::shared_ptr<cs6300::BasicBlock> cs6300::AndExpression::emit() const
 {
+  if(isConst())
+    return LiteralExpression(value()).emit();
   return emitBinaryOp(ThreeAddressInstruction::And,getLabel(),m_lhs,m_rhs);
 }
 

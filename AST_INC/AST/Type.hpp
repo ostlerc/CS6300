@@ -5,19 +5,22 @@
 #include <memory>
 #include <string>
 
+using std::string;
+
 namespace cs6300
 {
 class Type
 {
   public:
   virtual int size() = 0;
+  virtual string str() = 0;
   virtual ~Type()=default;
 };
 
-class IntType:public Type {public: int size(){return 4;} };
-class CharType:public Type {public: int size(){return 4;} };
-class BoolType:public Type {public: int size(){return 4;} };
-class StringType:public Type {public: int size(){return 0;} };
+class IntType:public Type {public: int size(){return 4;} string str(){return "int";} };
+class CharType:public Type {public: int size(){return 4;} string str(){return "char";}};
+class BoolType:public Type {public: int size(){return 4;} string str(){return "bool";}};
+class StringType:public Type {public: int size(){return 0;} string str(){return "string";}};
 
 class RecordType : public Type
 {
@@ -28,6 +31,7 @@ class RecordType : public Type
     {
     }
   int size();
+  string str() {return "record";}
   std::map<std::string,std::shared_ptr<Type>> fields;
 };
 
@@ -42,6 +46,7 @@ class ArrayType : public Type
     {
     }
   int size();
+  string str() {return "array";}
   std::shared_ptr<Type> baseType;
   int lowerbound;
   int upperbound;

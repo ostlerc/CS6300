@@ -1,17 +1,44 @@
 #include "Optimizer.hpp"
+#include <iostream>
+#include "../AST_INC/AST/Program.hpp"
+
+using namespace std;
+
+typedef shared_ptr<cs6300::BasicBlock> sBBlock;
+typedef shared_ptr<cs6300::Program> sProgram;
+typedef pair<sBBlock, sBBlock> blockPair;
+typedef vector<shared_ptr<cs6300::Statement>> statements;
 
 /*Add new AST based optimizations here*/
-std::shared_ptr<cs6300::Program>
-cs6300::optimizer(std::shared_ptr<cs6300::Program> original)
+sProgram cs6300::optimizer(sProgram original)
 {
-  return original;
-}
-/*Add new control flow graph based optimizations here*/
-std::pair<std::shared_ptr<cs6300::BasicBlock>,
-          std::shared_ptr<cs6300::BasicBlock>>
-cs6300::optimizer(std::pair<std::shared_ptr<cs6300::BasicBlock>,
-                            std::shared_ptr<cs6300::BasicBlock>> original)
-{
-  return original;
+    optimize(original->main);
+    return original;
 }
 
+void cs6300::constantFolding(statements original)
+{
+    cout << "doing folding stuffz" << endl;
+}
+
+/*Add new control flow graph based optimizations here*/
+blockPair cs6300::optimizeFlow(blockPair original)
+{
+    int count = 0;
+    auto at = original.first;
+
+    while(at)
+    {
+        at->printInstructions();
+        count++;
+        at = at->jumpTo;
+    }
+    cout << "count is " << count << endl;
+    return original;
+}
+
+void cs6300::optimize(statements s)
+{
+    constantFolding(s);
+    optimizeFlow(cs6300::emitList(s));
+}
