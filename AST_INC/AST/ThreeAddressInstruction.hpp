@@ -2,6 +2,7 @@
 #define CS6300_THREE_ADDRESS_INSTRUCTION_HPP
 
 #include <memory>
+#include <string>
 
 namespace cs6300
 {
