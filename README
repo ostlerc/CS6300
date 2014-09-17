@@ -1,0 +1,1 @@
+To run unit tests do './cpsl -t'. Some output will be spewed and a confirmation that tests have passed will be emmited.
