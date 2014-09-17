@@ -10,7 +10,7 @@ cs6300::NotExpression::NotExpression(
 std::shared_ptr<cs6300::BasicBlock> cs6300::NotExpression::emit() const
 {
     if(isConst())
-        return LiteralExpression(value()).emit();
+        return LiteralExpression::emit(value(), getLabel());
 
   auto result = m_expr->emit();
   result->instructions.emplace_back(

@@ -1,4 +1,5 @@
 #include "UnaryMinusExpression.hpp"
+#include "LiteralExpression.hpp"
 
 cs6300::UnaryMinusExpression::UnaryMinusExpression(
   std::shared_ptr<Expression> expr)
@@ -8,6 +9,8 @@ cs6300::UnaryMinusExpression::UnaryMinusExpression(
 
 std::shared_ptr<cs6300::BasicBlock> cs6300::UnaryMinusExpression::emit() const
 {
+    if(isConst())
+        return LiteralExpression::emit(value(), getLabel());
   auto result = m_expr->emit();
   result->instructions.emplace_back(
       ThreeAddressInstruction::UnaryMinus, getLabel(), m_expr->getLabel(), 0);

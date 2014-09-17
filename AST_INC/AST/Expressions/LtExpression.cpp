@@ -11,7 +11,7 @@ cs6300::LtExpression::LtExpression (std::shared_ptr<Expression> lhs,
 std::shared_ptr<cs6300::BasicBlock> cs6300::LtExpression::emit() const
 {
     if(isConst())
-        return LiteralExpression(value()).emit();
+        return LiteralExpression::emit(value(), getLabel());
     return emitBinaryOp(
             ThreeAddressInstruction::IsLess, getLabel(), m_lhs, m_rhs);
 }

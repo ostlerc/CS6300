@@ -1,4 +1,6 @@
 #include "SubtractExpression.hpp"
+#include "LiteralExpression.hpp"
+
 cs6300::SubtractExpression::SubtractExpression (std::shared_ptr<Expression> lhs,
                                                std::shared_ptr<Expression> rhs)
   : m_lhs(lhs)
@@ -8,6 +10,8 @@ cs6300::SubtractExpression::SubtractExpression (std::shared_ptr<Expression> lhs,
 
 std::shared_ptr<cs6300::BasicBlock> cs6300::SubtractExpression::emit() const
 {
+    if(isConst())
+        return LiteralExpression::emit(value(), getLabel());
   return emitBinaryOp(
       ThreeAddressInstruction::Subtract, getLabel(), m_lhs, m_rhs);
 }

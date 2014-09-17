@@ -16,29 +16,25 @@ sProgram cs6300::optimizer(sProgram original)
     return original;
 }
 
-void cs6300::constantFolding(statements original)
+void printInstructions(blockPair b)
 {
-    cout << "doing folding stuffz" << endl;
+    auto at = b.first;
+
+    while(at)
+    {
+        at->printInstructions();
+        at = at->jumpTo;
+    }
 }
 
 /*Add new control flow graph based optimizations here*/
 blockPair cs6300::optimizeFlow(blockPair original)
 {
-    int count = 0;
-    auto at = original.first;
-
-    while(at)
-    {
-        at->printInstructions();
-        count++;
-        at = at->jumpTo;
-    }
-    cout << "count is " << count << endl;
+    printInstructions(original);
     return original;
 }
 
 void cs6300::optimize(statements s)
 {
-    constantFolding(s);
     optimizeFlow(cs6300::emitList(s));
 }

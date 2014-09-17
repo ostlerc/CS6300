@@ -29,3 +29,10 @@ int cs6300::LiteralExpression::value() const { return m_value; }
 
 bool cs6300::LiteralExpression::isConst() const { return true; }
 
+std::shared_ptr<cs6300::BasicBlock> cs6300::LiteralExpression::emit(int value, int label)
+{
+    auto result = std::make_shared<BasicBlock>();
+    result->instructions.emplace_back(
+            ThreeAddressInstruction::LoadValue, label, value, 0);
+    return result;
+}
