@@ -18,6 +18,11 @@ int main(int argc, char * argv[])
     outFile = argv[2];
     inFile = argv[3];
   }
+  else if(argv[1] == std::string("-t")) //run tests
+  {
+      cs6300::test();
+      return EXIT_SUCCESS;
+  }
   else
   {
     inFile = argv[1];

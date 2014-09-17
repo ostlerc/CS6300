@@ -9,7 +9,6 @@ cs6300::Assignment::emit()
     auto block = expr->emit();
     auto addr = lval->address();
     auto addrblock = addr->emit();
-    //until we have arrays no need...
     std::copy(addrblock->instructions.begin(),
             addrblock->instructions.end(),
             std::back_inserter(block->instructions));

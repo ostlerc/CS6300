@@ -19,6 +19,11 @@ namespace cs6300
 
   /*Returns an improves statements list*/
   void optimize(std::vector<std::shared_ptr<Statement>>);
+
+  std::shared_ptr<BasicBlock> subExprElim(std::shared_ptr<BasicBlock> b);
+
+  /* Runs unit tests */
+  void test();
 }
 
 
