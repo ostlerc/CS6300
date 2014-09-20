@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <set>
 
 namespace cs6300
 {
@@ -20,11 +21,17 @@ namespace cs6300
   /*Returns an improves statements list*/
   void optimize(std::vector<std::shared_ptr<Statement>>);
 
+  /*Optimize by local register allocation methods*/
+  void locRegAlloc(std::pair<std::shared_ptr<BasicBlock>, std::shared_ptr<BasicBlock>>);
+  bool pushUp(std::shared_ptr<BasicBlock>, std::shared_ptr<BasicBlock>);
+  std::vector<std::set<int>> regDeps(std::shared_ptr<BasicBlock>);
+
   std::shared_ptr<BasicBlock> subExprElim(std::shared_ptr<BasicBlock> b);
 
   /* Runs unit tests */
   void test();
   void testSubExprElim();
+  void testRegAlloc();
 }
 
 
