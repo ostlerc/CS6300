@@ -11,7 +11,7 @@ cs6300::AdditionExpression::AdditionExpression(std::shared_ptr<Expression> lhs,
 std::shared_ptr<cs6300::BasicBlock> cs6300::AdditionExpression::emit() const
 {
     if(isConst())
-        return LiteralExpression(value()).emit();
+        return LiteralExpression::emit(value(), getLabel());
   return emitBinaryOp(ThreeAddressInstruction::Add, getLabel(), m_lhs, m_rhs);
 }
 

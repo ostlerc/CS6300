@@ -2,6 +2,7 @@
 #define CS6300_THREE_ADDRESS_INSTRUCTION_HPP
 
 #include <memory>
+#include <string>
 
 namespace cs6300
 {
@@ -45,6 +46,11 @@ class ThreeAddressInstruction
     {
         return typeStr(op) + " " + std::to_string(dest) + " " + std::to_string(src1) + " " + std::to_string(src2);
     }
+
+    std::string key()
+    {
+        return typeStr(op) + "|" + std::to_string(src1) + "|" + std::to_string(src2);
+    }
     static std::string typeStr(Type op)
     {
         switch(op) {
@@ -80,7 +86,6 @@ class ThreeAddressInstruction
             default: return "err";
         }
     }
-  private:
     Type op;
     int dest;
     int src1;
