@@ -26,10 +26,10 @@ int main(int argc, char* argv[])
     auto optimized = cs6300::optimizer(program);
     auto intermediate =
       std::make_shared<cs6300::IntermediateRepresentationProgram>(optimized);
-    intermediate->main = cs6300::optimizer(intermediate->main);
+    intermediate->main = cs6300::optimizeFlow(intermediate->main);
     for (auto&& f : intermediate->functions)
     {
-      f.second = cs6300::optimizer(f.second);
+      f.second = cs6300::optimizeFlow(f.second);
     }
     cs6300::writeMIPS(intermediate, outFile);
   }

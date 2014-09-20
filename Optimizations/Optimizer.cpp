@@ -16,11 +16,6 @@ sProgram cs6300::optimizer(sProgram original)
     return original;
 }
 
-void cs6300::constantFolding(statements original)
-{
-    cout << "doing folding stuffz" << endl;
-}
-
 /*Add new control flow graph based optimizations here*/
 blockPair cs6300::optimizeFlow(blockPair original)
 {
@@ -39,6 +34,4 @@ blockPair cs6300::optimizeFlow(blockPair original)
 
 void cs6300::optimize(statements s)
 {
-    constantFolding(s);
-    optimizeFlow(cs6300::emitList(s));
 }
