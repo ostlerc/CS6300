@@ -10,6 +10,7 @@ using namespace std;
 #include <memory>
 #include <set>
 #include <vector>
+#include <string>
 
 #include "ThreeAddressInstruction.hpp"
 
@@ -40,6 +41,7 @@ namespace cs6300
             RegMeta m;
 
             int branchOn;
+            std::string getLabel();
             void printInstructions(bool sets=false)
             {
                 for(auto i : instructions)
@@ -135,6 +137,8 @@ namespace cs6300
                 }
                 return m;
             }
+        private:
+            std::string label;
     };
 }
 #endif

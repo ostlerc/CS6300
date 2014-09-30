@@ -45,7 +45,7 @@ void printInstructions(blockPair b)
 blockPair cs6300::optimizeFlow(blockPair original)
 {
     locRegAlloc(original);
-    printInstructions(original);
+    //printInstructions(original);
     return original;
 }
 
@@ -115,20 +115,20 @@ void cs6300::locRegAlloc(blockPair b)
             continue; //already colored
         }
 
-        for(int i =1;; i++)
+        for(int i =8;; i++)
         {
             if(!p.second->cant.count(i))
             {
                 p.second->color = i;
                 regRemap[p.first] = i;
-                cout << "remapping " << p.first << " to " << i << endl;
+                //cout << "remapping " << p.first << " to " << i << endl;
                 for(auto& n : p.second->nodes)
                 {
                     n->cant.insert(i);
                 }
                 break;
             }
-            if(i==1000)
+            if(i==24)
             {
                 cout << "Too many colors tried" << endl;
                 break;
@@ -226,13 +226,8 @@ shared_ptr<cs6300::BasicBlock> cs6300::subExprElim(shared_ptr<cs6300::BasicBlock
     {
         if(i.op == ThreeAddressInstruction::StoreMemory) {
             for (auto iter = dMap.begin(); iter != dMap.end();) {
-                if (iter->first == i.dest) {
                     iter = dMap.erase(iter);
-                } else {
-                    iter++;
-                }
             }
-            continue;
         }
         auto key = i.key();
         if(opMap.count(key)) {
@@ -246,16 +241,12 @@ shared_ptr<cs6300::BasicBlock> cs6300::subExprElim(shared_ptr<cs6300::BasicBlock
             }
             opMap[key] = i.dest;
         }
-
-    }
-
-    for(auto i : b->instructions)
-    {
         if(!dMap.count(i.dest)) {
             cout << i.str() << endl;
             ret->instructions.emplace_back(i);
         }
     }
+
     return ret;
 }
 
@@ -279,4 +270,3 @@ void cs6300::testSubExprElim()
         exit(1);
     }
 }
-

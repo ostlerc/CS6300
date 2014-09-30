@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <iostream>
 
 namespace cs6300
 {
@@ -42,6 +43,7 @@ class ThreeAddressInstruction
       WriteStr
     };
     ThreeAddressInstruction(Type op,int dest,int src1,int src2);
+
     std::string str()
     {
         return typeStr(op) + " " + std::to_string(dest) + " " + std::to_string(src1) + " " + std::to_string(src2);
@@ -86,10 +88,13 @@ class ThreeAddressInstruction
             default: return "err";
         }
     }
+
     Type op;
     int dest;
     int src1;
     int src2;
 };
+std::ostream& operator<<(std::ostream&,ThreeAddressInstruction);
+
 }
 #endif
