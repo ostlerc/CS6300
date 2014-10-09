@@ -13,9 +13,36 @@ typedef shared_ptr<cs6300::Program> sProgram;
 typedef pair<sBBlock, sBBlock> blockPair;
 typedef vector<shared_ptr<cs6300::Statement>> statements;
 
+set<sBBlock> allBlocks(blockPair b)
+{
+    set<sBBlock> all;
+    vector<sBBlock> todo;
+    auto at = b.first;
+
+    do
+    {
+        if(todo.size())
+        {
+            at = todo.back();
+            todo.pop_back();
+        }
+
+        while(at)
+        {
+            all.insert(at);
+            if(at->branchTo && !all.count(at->branchTo))
+                todo.emplace_back(at->branchTo);
+
+            at = at->jumpTo;
+        }
+    }while(todo.size());
+
+    return all;
+}
+
 void cs6300::test()
 {
-    //testSubExprElim();
+    testSubExprElim();
     testRegAlloc();
     cout << "all tests have passed" << endl;
 }
@@ -44,6 +71,7 @@ void printInstructions(blockPair b)
 /*Add new control flow graph based optimizations here*/
 blockPair cs6300::optimizeFlow(blockPair original)
 {
+    subExprElim(original);
     locRegAlloc(original);
     //printInstructions(original);
     return original;
@@ -128,7 +156,7 @@ void cs6300::locRegAlloc(blockPair b)
                 }
                 break;
             }
-            if(i==24)
+            if(i==26)
             {
                 cout << "Too many colors tried" << endl;
                 break;
@@ -209,45 +237,53 @@ void cs6300::testRegAlloc()
     four->instructions.emplace_back(ThreeAddressInstruction::WriteInt,0,1,0); // write(i)
 
     auto blocks = make_pair(one, four);
-    cout << "before" << endl;
-    printInstructions(blocks);
+    //cout << "before" << endl;
+    //printInstructions(blocks);
     locRegAlloc(blocks);
-    cout << "after" << endl;
-    printInstructions(blocks);
+    //cout << "after" << endl;
+    //printInstructions(blocks);
 }
 
-shared_ptr<cs6300::BasicBlock> cs6300::subExprElim(shared_ptr<cs6300::BasicBlock> b)
+void cs6300::subExprElim(blockPair p)
 {
-    map<string,int> opMap;
-    map<int,int> dMap;
-    auto ret = make_shared<cs6300::BasicBlock>();
-
-    for(auto i : b->instructions)
+    for(auto b : allBlocks(p))
     {
-        if(i.op == ThreeAddressInstruction::StoreMemory) {
-            for (auto iter = dMap.begin(); iter != dMap.end();) {
-                    iter = dMap.erase(iter);
-            }
-        }
-        auto key = i.key();
-        if(opMap.count(key)) {
-            auto dest = opMap[key];
-            if (i.dest != dest) {
-                dMap[i.dest] = dest;
-            }
-        } else {
-            if(dMap.count(i.dest)) {
-                i.dest = dMap[i.dest];
-            }
-            opMap[key] = i.dest;
-        }
-        if(!dMap.count(i.dest)) {
-            cout << i.str() << endl;
-            ret->instructions.emplace_back(i);
-        }
-    }
+        map<string,int> opMap;
+        map<int,int> dMap;
+        auto ret = make_shared<cs6300::BasicBlock>();
 
-    return ret;
+        for(auto i : b->instructions)
+        {
+            if(i.op == ThreeAddressInstruction::StoreMemory) {
+                for (auto iter = dMap.begin(); iter != dMap.end();) {
+                    iter = dMap.erase(iter);
+                }
+            }
+            if(dMap.count(i.src1)) {
+                i.src1 = dMap[i.src1];
+            }
+
+            if(dMap.count(i.src2)) {
+                i.src2 = dMap[i.src2];
+            }
+
+            auto key = i.key();
+            if(opMap.count(key)) {
+                auto dest = opMap[key];
+                if (i.dest != dest) {
+                    dMap[i.dest] = dest;
+                }
+            } else {
+                if(dMap.count(i.dest)) {
+                    i.dest = dMap[i.dest];
+                }
+                opMap[key] = i.dest;
+                ret->instructions.emplace_back(i);
+            }
+        }
+
+        *b = *ret;
+    }
 }
 
 void cs6300::testSubExprElim()
@@ -255,18 +291,19 @@ void cs6300::testSubExprElim()
     vector<shared_ptr<Statement>> tstatements;
     auto blocks = emitList(tstatements);
 
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::LoadValue,1,2,0); //2
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::StoreMemory,1,2,0); //a := 2
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::LoadValue,3,2,0); // 2
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::LoadValue,5,7,0); //7
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::LoadValue,6,7,0); //7
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::LoadValue,7,7,0); //7
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::LoadValue,8,7,0); //7
-    blocks.first->instructions.emplace_back(ThreeAddressInstruction::StoreMemory,3,4,0); // b := 2
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,1,2,3);
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,2,2,3);
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,3,1,2);
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,5,7,0);
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,6,7,0);
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,7,7,0);
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,8,7,0);
+    blocks.first->instructions.emplace_back(ThreeAddressInstruction::Add,3,4,0);
 
-    int s = subExprElim(blocks.first)->instructions.size();
-    if(s != 5) {
-        cerr << "Incorrect optimized size " << s << endl;
+    subExprElim(blocks);
+    if(blocks.first->instructions.size() != 5) {
+        cerr << "Incorrect optimized size " << blocks.first->instructions.size() << endl;
         exit(1);
     }
+    //blocks.first->printInstructions();
 }

@@ -26,7 +26,7 @@ namespace cs6300
   bool pushUp(std::shared_ptr<BasicBlock>, std::shared_ptr<BasicBlock>);
   std::vector<std::set<int>> regDeps(std::shared_ptr<BasicBlock>);
 
-  std::shared_ptr<BasicBlock> subExprElim(std::shared_ptr<BasicBlock> b);
+  void subExprElim(std::pair<std::shared_ptr<BasicBlock>, std::shared_ptr<BasicBlock>> b);
 
   /* Runs unit tests */
   void test();

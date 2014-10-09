@@ -1,1 +1,3 @@
-To run unit tests do './cpsl -t'. Some output will be spewed and a confirmation that tests have passed will be emmited.
+To run unit tests do './cpsl -t'. output will print when tests have failed or succeeded.
+
+To view tests, look in the Optimizer.cpp
