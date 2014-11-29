@@ -38,7 +38,15 @@ std::set<std::shared_ptr<cs6300::BasicBlock>> cs6300::allBlocks(
       }
 
       if (at->branchTo && !all.count(at->branchTo))
+      {
+          at->branchTo->parents.insert(at);
         todo.emplace_back(at->branchTo);
+      }
+
+      if(at->jumpTo)
+      {
+          at->jumpTo->parents.insert(at);
+      }
 
       at = at->jumpTo;
     }

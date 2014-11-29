@@ -34,7 +34,14 @@ struct ExprNode
     std::string key;
 };
 
-void printset(std::string name, std::set<int> s);
+template <class T>
+void printset(std::string name, std::set<T> s)
+{
+    std::cout << name << ": ";
+    for(auto&&i : s)
+        std::cout << i << " ";
+    std::cout << std::endl;
+}
 std::set<std::shared_ptr<cs6300::BasicBlock>> allBlocks(
         std::pair<std::shared_ptr<cs6300::BasicBlock>,
         std::shared_ptr<cs6300::BasicBlock>> b);

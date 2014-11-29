@@ -10,10 +10,26 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
     m.graph = graph;
     m.nmapcalc();
     m.printmap();
+
     for (auto&& bb : allBlocks(graph))
     {
-        bb->calcall(m);
+        bb->DEcalc(m);
+        bb->UEcalc(m);
+        bb->Killcalc(m);
     }
+
+    auto change = false;
+    do
+    {
+        for (auto&& bb : allBlocks(graph))
+        {
+            printset(bb->getLabel(), bb->parents);
+            if(bb->Avicalc(m)) change = true;
+            if(bb->Avocalc(m)) change = true;
+        }
+    } while(change);
+
+
     return m;
 }
 
@@ -33,12 +49,4 @@ void cs6300::Motion::printmap()
 void cs6300::Motion::nmapcalc()
 {
     nmap[108] = new ExprNode("5");
-}
-
-void printset(std::string name, std::set<int> s)
-{
-    std::cout << name << ": ";
-    for(auto&i : s)
-        std::cout << i << " ";
-    std::cout << std::endl;
 }

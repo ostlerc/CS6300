@@ -2,6 +2,7 @@
 #define CS6300_BASIC_BLOCK_HPP
 
 #include <memory>
+#include <iostream>
 #include <vector>
 #include <set>
 #include <map>
@@ -19,30 +20,32 @@ public:
   std::vector<ThreeAddressInstruction> instructions;
   std::shared_ptr<BasicBlock> jumpTo;
   std::shared_ptr<BasicBlock> branchTo;
-  std::vector<std::shared_ptr<BasicBlock>> parents;
+  std::set<std::shared_ptr<BasicBlock>> parents;
   int branchOn;
   std::string getLabel();
 
   cs6300::RegisterScope m; // Used for register allocation
   cs6300::MotionSet mset; // Used for code motion
-  cs6300::Motion motion; // Used for code motion
 
   void initSets();
   static cs6300::RegisterScope scope(ThreeAddressInstruction tal);
   void remap(std::map<int, int> m);
 
   //Code motion functions
-  void calcall(Motion);
-  void DEcalc();
-  void UEcalc();
-  void Avocalc();
-  void Avicalc();
-  void Anocalc();
-  void Anicalc();
+  void DEcalc(Motion);
+  void UEcalc(Motion);
+  void Killcalc(Motion);
+  bool Avocalc(Motion);
+  bool Avicalc(Motion);
+  bool Anocalc(Motion);
+  bool Anicalc(Motion);
 
 private:
   std::string label;
   static bool validReg(int reg);
 };
+
+std::ostream& operator<<(std::ostream&, BasicBlock);
+std::ostream& operator<<(std::ostream&, std::shared_ptr<BasicBlock>);
 }
 #endif

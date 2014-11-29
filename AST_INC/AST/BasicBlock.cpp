@@ -109,34 +109,50 @@ void cs6300::BasicBlock::remap(std::map<int, int> m)
   }
 }
 
-void cs6300::BasicBlock::calcall(cs6300::Motion _m)
+void cs6300::BasicBlock::DEcalc(Motion _m)
 {
-    motion = _m;
-    DEcalc();
-}
-
-void cs6300::BasicBlock::DEcalc()
-{
-    motion.printmap();
+    _m.printmap();
     mset.DE = {1,2,3};
 }
 
-void cs6300::BasicBlock::UEcalc()
+void cs6300::BasicBlock::UEcalc(Motion _m)
 {
 }
 
-void cs6300::BasicBlock::Avocalc()
+void cs6300::BasicBlock::Killcalc(Motion _m)
 {
 }
 
-void cs6300::BasicBlock::Avicalc()
+bool cs6300::BasicBlock::Avocalc(Motion _m)
 {
+    return false;
 }
 
-void cs6300::BasicBlock::Anocalc()
+bool cs6300::BasicBlock::Avicalc(Motion _m)
 {
+    return false;
 }
 
-void cs6300::BasicBlock::Anicalc()
+bool cs6300::BasicBlock::Anocalc(Motion _m)
 {
+    return false;
+}
+
+bool cs6300::BasicBlock::Anicalc(Motion _m)
+{
+    return false;
+}
+
+std::ostream& cs6300::operator<<(std::ostream& out,
+        std::shared_ptr<cs6300::BasicBlock> b)
+{
+    out << b->getLabel();
+    return out;
+}
+
+std::ostream& cs6300::operator<<(std::ostream& out,
+        BasicBlock b)
+{
+    out << b.getLabel();
+    return out;
 }
