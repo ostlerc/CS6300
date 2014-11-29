@@ -11,7 +11,7 @@ int cs6300::Expression::getLabel() const
 
 int cs6300::Expression::getNextLabel()
 {
-  static int curLabel = 0;
+  static int curLabel = 107;
   return ++curLabel;
 }
 

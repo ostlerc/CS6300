@@ -20,6 +20,8 @@ public:
   virtual std::shared_ptr<Type> type() const = 0;
   virtual bool isConst() const = 0;
   virtual std::shared_ptr<Expression> value() const = 0;
+  virtual std::shared_ptr<Symbol> symbol() const = 0;
+  virtual MemoryLocation getMemoryLocation() { return m_table->getMemoryLocation(); }
 
 protected:
   std::shared_ptr<SymbolTable> m_table;
@@ -50,6 +52,10 @@ public:
   std::shared_ptr<Expression> value() const
   {
     return m_table->lookupConstant(name);
+  }
+  std::shared_ptr<Symbol> symbol() const
+  {
+      return m_table->lookupVariable(name);
   }
   std::string name;
 };
@@ -85,6 +91,10 @@ public:
   {
     return 0;
   }
+  std::shared_ptr<Symbol> symbol() const
+  {
+      return NULL;
+  }
   std::shared_ptr<LValue> base;
   std::string field;
 };
@@ -118,6 +128,10 @@ public:
   std::shared_ptr<Expression> value() const
   {
     return expr;
+  }
+  std::shared_ptr<Symbol> symbol() const
+  {
+      return NULL;
   }
   std::shared_ptr<LValue> base;
   std::shared_ptr<Expression> expr;

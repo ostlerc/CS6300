@@ -14,10 +14,21 @@ std::shared_ptr<cs6300::BasicBlock> cs6300::LoadExpression::emit() const
          ThreeAddressInstruction::LoadValue, getLabel(), value(), 0);
       return block;
   }
-  auto address = lval->address();
-  block = address->emit();
-  block->instructions.emplace_back(
-    ThreeAddressInstruction::LoadMemory, getLabel(), address->getLabel(), 0);
+  if(lval->symbol())
+  {
+      block = std::make_shared<cs6300::BasicBlock>();
+      block->instructions.emplace_back(ThreeAddressInstruction::LoadMemory,
+              getLabel(),
+              lval->getMemoryLocation(),
+              lval->symbol()->memory_offset);
+  }
+  else
+  {
+      auto address = lval->address();
+      block = address->emit();
+      block->instructions.emplace_back(
+              ThreeAddressInstruction::LoadMemory, getLabel(), address->getLabel(), 0);
+  }
   return block;
 }
 std::shared_ptr<cs6300::Type> cs6300::LoadExpression::type() const

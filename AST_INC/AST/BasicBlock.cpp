@@ -41,31 +41,36 @@ cs6300::RegisterScope cs6300::BasicBlock::scope(
   case ThreeAddressInstruction::CallFunction: // CallFunction should have no allocation
     break;
   case ThreeAddressInstruction::LoadMemory:
-    m.dead.insert(tal.dest);
-    m.used.insert(tal.src1);
+    if(validReg(tal.dest)) m.dead.insert(tal.dest);
+    if(validReg(tal.src1)) m.used.insert(tal.src1);
     break;
   case ThreeAddressInstruction::LoadMemoryOffset:
   case ThreeAddressInstruction::LoadValue: // LoadValue has constants
-    m.dead.insert(tal.dest);
+    if(validReg(tal.dest)) m.dead.insert(tal.dest);
     break;
   case ThreeAddressInstruction::
     StoreMemory: // special case store memory dest is src1
-    m.used.insert(tal.dest);
-    m.used.insert(tal.src1);
+    if(validReg(tal.dest)) m.used.insert(tal.dest);
+    if(validReg(tal.src1)) m.used.insert(tal.src1);
     break;
   case ThreeAddressInstruction::AddValue:
-    m.dead.insert(tal.dest);
-    m.used.insert(tal.src1);
+    if(validReg(tal.dest)) m.dead.insert(tal.dest);
+    if(validReg(tal.src1)) m.used.insert(tal.src1);
     break;
   case ThreeAddressInstruction::WriteStr: // none
     break;
   default:
-    if (tal.dest) m.dead.insert(tal.dest);
-    if (tal.src1) m.used.insert(tal.src1);
-    if (tal.src2) m.used.insert(tal.src2);
+    if(validReg(tal.dest)) m.dead.insert(tal.dest);
+    if(validReg(tal.src1)) m.used.insert(tal.src1);
+    if(validReg(tal.src2)) m.used.insert(tal.src2);
   }
 
   return m;
+}
+
+bool cs6300::BasicBlock::validReg(int reg)
+{
+    return reg > 100;
 }
 
 void cs6300::BasicBlock::remap(std::map<int, int> m)
@@ -77,25 +82,25 @@ void cs6300::BasicBlock::remap(std::map<int, int> m)
     case ThreeAddressInstruction::CallFunction: // CallFunction should have no allocation
       break;
     case ThreeAddressInstruction::LoadMemoryOffset:
-      if (i.dest && m.count(i.dest)) i.dest = m[i.dest];
+      if (validReg(i.dest) && m.count(i.dest)) i.dest = m[i.dest];
       break;
     case ThreeAddressInstruction::LoadValue: // LoadValue has constants
-      if (i.dest && m.count(i.dest)) i.dest = m[i.dest];
+      if (validReg(i.dest) && m.count(i.dest)) i.dest = m[i.dest];
       break;
     case ThreeAddressInstruction::StoreMemory:
     case ThreeAddressInstruction::AddValue:
     case ThreeAddressInstruction::LoadMemory:
-      if (i.dest && m.count(i.dest)) i.dest = m[i.dest];
-      if (i.src1 && m.count(i.src1)) i.src1 = m[i.src1];
+      if (validReg(i.dest) && m.count(i.dest)) i.dest = m[i.dest];
+      if (validReg(i.src1) && m.count(i.src1)) i.src1 = m[i.src1];
       break;
     case ThreeAddressInstruction::WriteStr: // none
       break;
     default:
-      if (i.dest && m.count(i.dest)) i.dest = m[i.dest];
+      if (validReg(i.dest) && m.count(i.dest)) i.dest = m[i.dest];
 
-      if (i.src1 && m.count(i.src1)) i.src1 = m[i.src1];
+      if (validReg(i.src1) && m.count(i.src1)) i.src1 = m[i.src1];
 
-      if (i.src2 && m.count(i.src2)) i.src2 = m[i.src2];
+      if (validReg(i.src2) && m.count(i.src2)) i.src2 = m[i.src2];
     }
   }
   if(branchTo && m.count(branchOn))

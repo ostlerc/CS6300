@@ -30,6 +30,7 @@ public:
 
 private:
   std::string label;
+  static bool validReg(int reg);
 };
 }
 #endif

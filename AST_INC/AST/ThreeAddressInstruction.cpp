@@ -61,9 +61,10 @@ std::ostream& cs6300::operator<<(std::ostream& out,
     break;
   case cs6300::ThreeAddressInstruction::LoadMemoryOffset:
     if (i.src1 == cs6300::GLOBAL)
-      out << "addi $" << i.dest << ", $gp, " << i.src2;
+      out << "addi $" << i.dest << ", $" << i.src1 << ", ";
     else if (i.src1 == cs6300::STACK)
-      out << "addi $" << i.dest << ", $sp, -" << i.src2;
+      out << "-";
+    out << i.src2;
     break;
 
   case cs6300::ThreeAddressInstruction::LoadValue:
