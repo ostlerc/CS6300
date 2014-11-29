@@ -2,6 +2,7 @@
 #define CS6300_THREE_ADDRESS_INSTRUCTION_HPP
 
 #include <memory>
+#include <string>
 #include <iostream>
 
 namespace cs6300
@@ -49,6 +50,8 @@ public:
   int dest;
   int src1;
   int src2;
+
+  static std::string opstr(int);
 };
 std::ostream& operator<<(std::ostream&, ThreeAddressInstruction);
 }

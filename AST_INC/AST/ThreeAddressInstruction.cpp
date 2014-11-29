@@ -145,3 +145,76 @@ std::ostream& cs6300::operator<<(std::ostream& out,
   out << std::endl;
   return out;
 }
+
+std::string cs6300::ThreeAddressInstruction::opstr(int op)
+{
+    switch(op)
+    {
+        case Add:
+            return "Add";
+        case AddValue:
+            return "AddValue";
+        case And:
+            return "&&";
+        case CallFunction:
+            return "CallFunction";
+        case CopyArgument:
+            return "CopyArgument";
+        case Divide:
+            return "/";
+        case IsEqual:
+            return "==";
+        case IsGreater:
+            return ">";
+        case IsGreaterEqual:
+            return ">=";
+        case IsLess:
+            return "<";
+        case IsLessEqual:
+            return "<=";
+        case IsNotEqual:
+            return "!=";
+        case LoadLabel:
+            return "LoadLabel";
+        case LoadMemory:
+            return "LoadMemory";
+        case LoadMemoryOffset:
+            return "LoadMemoryOffset";
+        case LoadValue:
+            return "LoadValue";
+        case Modulo:
+            return "%";
+        case Multiply:
+            return "*";
+        case Not:
+            return "!";
+        case Or:
+            return "||";
+        case ReadChar:
+            return "ReadChar";
+        case ReadInt:
+            return "ReadInt";
+        case RestoreFrame:
+            return "RestoreFrame";
+        case Stop:
+            return "Stop";
+        case StoreFrame:
+            return "StoreFrame";
+        case StoreMemory:
+            return "StoreMemory";
+        case Subtract:
+            return "Subtract";
+        case UnaryMinus:
+            return "UnaryMinus";
+        case WriteBool:
+            return "WriteBool";
+        case WriteChar:
+            return "WriteChar";
+        case WriteInt:
+            return "WriteInt";
+        case WriteStr:
+            return "WriteStr";
+        default:
+            return "ERR";
+    }
+}

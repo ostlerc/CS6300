@@ -55,7 +55,7 @@ void cs6300::writeMIPS(
   std::shared_ptr<IntermediateRepresentationProgram> program,
   std::string filename)
 {
-  locRegAlloc(program->main);
+  //locRegAlloc(program->main);
   std::ofstream fout(filename);
   fout << ".text" << std::endl << ".globl main" << std::endl << "main:"
        << "\tla $gp, GA" << std::endl << "\tori $fp, $sp, 0" << std::endl;
@@ -65,7 +65,7 @@ void cs6300::writeMIPS(
   for (auto&& f : program->functions)
   {
     fout << "F" << f.first.getLabel() << ":" << std::endl;
-    locRegAlloc(f.second);
+    //locRegAlloc(f.second);
     emitMIPS(f.second, fout);
     fout << "\tjr $ra" << std::endl;
   }

@@ -13,6 +13,7 @@
 namespace cs6300
 {
 
+    bool validReg(int reg);
 class BasicBlock
 {
 
@@ -42,7 +43,6 @@ public:
 
 private:
   std::string label;
-  static bool validReg(int reg);
 };
 
 std::ostream& operator<<(std::ostream&, BasicBlock);
