@@ -10,7 +10,7 @@ struct RegColorNode
   std::set<int> cant;
 };
 
-std::set<std::shared_ptr<cs6300::BasicBlock>> allBlocks(
+std::set<std::shared_ptr<cs6300::BasicBlock>> cs6300::allBlocks(
   std::pair<std::shared_ptr<cs6300::BasicBlock>,
             std::shared_ptr<cs6300::BasicBlock>> b)
 {

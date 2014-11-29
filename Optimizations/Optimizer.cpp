@@ -1,5 +1,6 @@
 #include "Optimizer.hpp"
 #include "MaximizeBlocks/MaximizeBlocks.hpp"
+#include "RegisterScope.hpp"
 
 #include <sstream>
 
@@ -16,6 +17,7 @@ cs6300::optimizer(std::pair<std::shared_ptr<cs6300::BasicBlock>,
                             std::shared_ptr<cs6300::BasicBlock>> original)
 {
   maximizeBlocks(original);
+  Motion::optimize(original);
   return original;
 }
 

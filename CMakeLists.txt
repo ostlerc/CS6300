@@ -9,9 +9,10 @@ FLEX_TARGET(CpslScanner FrontEnd/scanner.l ${CMAKE_CURRENT_BINARY_DIR}/scanner.c
 ADD_FLEX_BISON_DEPENDENCY(CpslScanner CpslParser)
 
 include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR} 
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/AST_INC)
+    ${CMAKE_CURRENT_SOURCE_DIR}/AST_INC
+    ${CMAKE_CURRENT_SOURCE_DIR}/AST_INC/AST)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -std=c++0x")
 set(cpsl_srcs main.cpp)
@@ -32,6 +33,7 @@ set(ast_srcs
   AST_INC/AST/BasicBlock.cpp
   AST_INC/AST/BasicBlock.hpp
   AST_INC/AST/RegisterScope.hpp
+  AST_INC/AST/RegisterScope.cpp
   AST_INC/AST/Function.cpp
   AST_INC/AST/Function.hpp
   AST_INC/AST/LValue.hpp

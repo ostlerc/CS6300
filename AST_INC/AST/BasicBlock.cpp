@@ -108,3 +108,35 @@ void cs6300::BasicBlock::remap(std::map<int, int> m)
       branchOn = m[branchOn];
   }
 }
+
+void cs6300::BasicBlock::calcall(cs6300::Motion _m)
+{
+    motion = _m;
+    DEcalc();
+}
+
+void cs6300::BasicBlock::DEcalc()
+{
+    motion.printmap();
+    mset.DE = {1,2,3};
+}
+
+void cs6300::BasicBlock::UEcalc()
+{
+}
+
+void cs6300::BasicBlock::Avocalc()
+{
+}
+
+void cs6300::BasicBlock::Avicalc()
+{
+}
+
+void cs6300::BasicBlock::Anocalc()
+{
+}
+
+void cs6300::BasicBlock::Anicalc()
+{
+}

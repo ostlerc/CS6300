@@ -11,6 +11,7 @@
 
 namespace cs6300
 {
+
 class BasicBlock
 {
 
@@ -22,11 +23,22 @@ public:
   int branchOn;
   std::string getLabel();
 
-  // Used for register allocation
-  cs6300::RegisterScope m;
+  cs6300::RegisterScope m; // Used for register allocation
+  cs6300::MotionSet mset; // Used for code motion
+  cs6300::Motion motion; // Used for code motion
+
   void initSets();
   static cs6300::RegisterScope scope(ThreeAddressInstruction tal);
   void remap(std::map<int, int> m);
+
+  //Code motion functions
+  void calcall(Motion);
+  void DEcalc();
+  void UEcalc();
+  void Avocalc();
+  void Avicalc();
+  void Anocalc();
+  void Anicalc();
 
 private:
   std::string label;
