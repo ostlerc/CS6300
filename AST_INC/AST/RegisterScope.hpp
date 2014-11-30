@@ -66,10 +66,10 @@ struct MotionSet
         printset("DE", DE);
         printset("UE", UE);
         printset("Kill", Kill);
-        printset("Avo", Avo);
         printset("Avi", Avi);
-        printset("Ano", Ano);
+        printset("Avo", Avo);
         printset("Ani", Ani);
+        printset("Ano", Ano);
     }
 };
 

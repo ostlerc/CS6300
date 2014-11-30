@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
+#include <set>
+#include <algorithm>
 
 std::string cs6300::BasicBlock::getLabel()
 {
@@ -109,6 +111,40 @@ void cs6300::BasicBlock::remap(std::map<int, int> m)
     }
 }
 
+void cs6300::BasicBlock::InitMotion(Motion _m)
+{
+    mset.Avi.clear();
+    mset.Avo.clear();
+    mset.Ani.clear();
+    mset.Ano.clear();
+
+    //available in = is everything initially (if not entry)
+    //anticipatible out = everything (if not exit)
+
+    bool entry = !parents.size();
+    bool exit = !jumpTo && !branchTo;
+
+    std::set<ExprNode*> allExprs;
+    for(auto&v : _m.smap) allExprs.insert(v.second);
+
+    if(!entry)
+        mset.Avi = std::set<ExprNode*>(allExprs.begin(), allExprs.end());
+    if(!exit)
+        mset.Ano = std::set<ExprNode*>(allExprs.begin(), allExprs.end());
+
+    //available out = DE + (AVIN - KILL)
+    std::set_difference(mset.Avi.begin(), mset.Avi.end(),
+                        mset.Kill.begin(), mset.Kill.end(),
+                        std::inserter(mset.Avo, mset.Avo.end())); //(AVIN - KILL)
+    mset.Avo.insert(mset.DE.begin(), mset.DE.end()); //DE + ^
+
+    //anticipatible in  = UE + (ANTOUT - KILL)
+    std::set_difference(mset.Ano.begin(), mset.Ano.end(),
+                        mset.Kill.begin(), mset.Kill.end(),
+                        std::inserter(mset.Ani, mset.Ani.end())); //(AVIN - KILL)
+    mset.Ani.insert(mset.UE.begin(), mset.UE.end()); //UE + ^
+}
+
 void cs6300::BasicBlock::DEcalc(Motion _m)
 {
     mset.DE.clear();
@@ -186,24 +222,70 @@ void cs6300::BasicBlock::UEcalc(Motion _m)
     }
 }
 
-bool cs6300::BasicBlock::Avocalc(Motion _m)
+bool cs6300::BasicBlock::Avcalc(Motion _m)
 {
-    return false;
+    int o = mset.Avo.size();
+    int i = mset.Avi.size();
+
+    mset.Avo.clear();
+    mset.Avi.clear();
+
+    bool init = true;
+
+    //in: intersection of parents out
+    for(auto&p : parents)
+    {
+        if(init)
+        {
+            mset.Avi.insert(p->mset.Avo.begin(), p->mset.Avo.end());
+            init = false;
+            continue;
+        }
+
+        std::set_intersection(mset.Avi.begin(), mset.Avi.end(),
+                              p->mset.Avo.begin(), p->mset.Avo.end(),
+                              std::inserter(mset.Avi, mset.Avi.end()));
+    }
+
+    //out: DE + (IN - KILL)
+    std::set_difference(mset.Avi.begin(), mset.Avi.end(),
+            mset.Kill.begin(), mset.Kill.end(),
+            std::inserter(mset.Avo, mset.Avo.end())); //(AVIN - KILL)
+    mset.Avo.insert(mset.DE.begin(), mset.DE.end()); //DE + ^
+    return o != mset.Avo.size() || i != mset.Avi.size();
 }
 
-bool cs6300::BasicBlock::Avicalc(Motion _m)
+bool cs6300::BasicBlock::Ancalc(Motion _m)
 {
-    return false;
-}
+    int i = mset.Ani.size();
+    int o = mset.Ano.size();
 
-bool cs6300::BasicBlock::Anocalc(Motion _m)
-{
-    return false;
-}
+    mset.Ano.clear();
+    mset.Ani.clear();
 
-bool cs6300::BasicBlock::Anicalc(Motion _m)
-{
-    return false;
+    bool init = true;
+
+    //out: intersection of parents in
+    for(auto&p : parents)
+    {
+        if(init)
+        {
+            mset.Ano.insert(p->mset.Ani.begin(), p->mset.Ani.end());
+            init = false;
+            continue;
+        }
+
+        std::set_intersection(mset.Ano.begin(), mset.Ano.end(),
+                p->mset.Ani.begin(), p->mset.Ani.end(),
+                std::inserter(mset.Ano, mset.Ano.end()));
+    }
+
+    //in: UE + (OUT - KILL)
+    std::set_difference(mset.Ano.begin(), mset.Ano.end(),
+            mset.Kill.begin(), mset.Kill.end(),
+            std::inserter(mset.Ani, mset.Ani.end())); //(OUT - KILL)
+    mset.Ani.insert(mset.UE.begin(), mset.UE.end()); //UE + ^
+    return o != mset.Ano.size() || i != mset.Ani.size();
 }
 
 std::ostream& cs6300::operator<<(std::ostream& out,

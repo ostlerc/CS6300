@@ -33,12 +33,11 @@ public:
   void remap(std::map<int, int> m);
 
   //Code motion functions
+  void InitMotion(Motion);
   void DEcalc(Motion);
   void UEcalc(Motion);
-  bool Avocalc(Motion);
-  bool Avicalc(Motion);
-  bool Anocalc(Motion);
-  bool Anicalc(Motion);
+  bool Avcalc(Motion);
+  bool Ancalc(Motion);
 
 private:
   std::string label;

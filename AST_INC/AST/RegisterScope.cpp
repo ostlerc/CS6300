@@ -12,23 +12,34 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
     m.nmapcalc();
     m.printmap();
 
+    // setup DE, UE, and Kill sets
     for (auto&& bb : allBlocks(graph))
     {
         bb->DEcalc(m);
         bb->UEcalc(m);
+    }
+
+    //Initialize available and anticipatible sets
+    for (auto&& bb : allBlocks(graph))
+        bb->InitMotion(m);
+
+    //crunch available and anticipatible sets
+    bool change = false;
+    do
+    {
+        change = false;
+        for (auto&& bb : allBlocks(graph))
+        {
+            if(bb->Avcalc(m)) change = true;
+            if(bb->Ancalc(m)) change = true;
+        }
+    } while(change);
+
+    for (auto&& bb : allBlocks(graph))
+    {
         cout << endl << bb->getLabel() << endl;
         bb->mset.printall();
     }
-
-    /*auto change = false;
-    do
-    {
-        for (auto&& bb : allBlocks(graph))
-        {
-            if(bb->Avicalc(m)) change = true;
-            if(bb->Avocalc(m)) change = true;
-        }
-    } while(change);*/
 
     return m;
 }
