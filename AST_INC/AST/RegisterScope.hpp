@@ -75,10 +75,10 @@ struct Motion
 
     std::pair<std::shared_ptr<BasicBlock>,std::shared_ptr<BasicBlock>> graph;
     std::set<int> regs(ExprNode*);
-    void moveExpr(ExprNode*, std::pair<std::shared_ptr<BasicBlock>,std::shared_ptr<BasicBlock>>);
+    bool moveExpr(ExprNode*, std::pair<std::shared_ptr<BasicBlock>,std::shared_ptr<BasicBlock>>);
     std::vector<cs6300::ThreeAddressInstruction> popTAL(ExprNode* node);
 
-    static void optimize(std::pair<std::shared_ptr<BasicBlock>,
+    static bool optimize(std::pair<std::shared_ptr<BasicBlock>,
             std::shared_ptr<BasicBlock>>);
 
     static Motion init(std::pair<std::shared_ptr<BasicBlock>,

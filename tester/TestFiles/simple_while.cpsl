@@ -1,11 +1,12 @@
-VAR a,x:integer;
+VAR a,b,x:integer;
 
 BEGIN
 
 a := 5;
+b := 4;
 x := 0;
 
-while x < a * 3 do
+while x < a * b do
   x := succ(x);
   write(x);
 end;

@@ -274,7 +274,6 @@ bool cs6300::BasicBlock::Ancalc(Motion _m)
         children.insert(jumpTo);
     if(branchTo)
         children.insert(branchTo);
-    std::cout << getLabel() << "-" << children.size() << " children" << std::endl;
     for(auto&c : children)
     {
         if(init)

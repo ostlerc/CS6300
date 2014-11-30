@@ -14,7 +14,7 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
     Motion m;
     m.graph = graph;
     m.nmapcalc();
-    m.printmap();
+    //m.printmap();
 
     // setup DE, UE, and Kill sets
     for (auto&& bb : allBlocks(graph))
@@ -42,25 +42,27 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
     return m;
 }
 
-void cs6300::Motion::optimize(std::pair<std::shared_ptr<BasicBlock>, std::shared_ptr<BasicBlock>> graph)
+bool cs6300::Motion::optimize(std::pair<std::shared_ptr<BasicBlock>, std::shared_ptr<BasicBlock>> graph)
 {
     auto m = init(graph); //calculate all the required data sets
 
+    bool change = false;
     for (auto&& bb : allBlocks(graph))
     {
         auto latest = bb->LatestCalc();
-        cout << endl << bb->getLabel() << endl;
-        bb->mset.printall();
+        //cout << endl << bb->getLabel() << endl;
+        //bb->mset.printall();
 
-        printset("jumpTo",latest.first);
-        printset("branchTo",latest.second);
+        //printset("jumpTo",latest.first);
+        //printset("branchTo",latest.second);
 
         if(bb->jumpTo)
         {
             std::pair<shared_ptr<BasicBlock>, shared_ptr<BasicBlock>> edge = {bb, bb->jumpTo};
             for(auto&expr : latest.first)
             {
-                m.moveExpr(expr, edge);
+                if(m.moveExpr(expr, edge))
+                    change = true;
             }
         }
         if(bb->branchTo)
@@ -68,24 +70,28 @@ void cs6300::Motion::optimize(std::pair<std::shared_ptr<BasicBlock>, std::shared
             std::pair<shared_ptr<BasicBlock>, shared_ptr<BasicBlock>> edge = {bb, bb->branchTo};
             for(auto&expr : latest.second)
             {
-                m.moveExpr(expr, edge);
+                if(m.moveExpr(expr, edge))
+                    change = true;
             }
         }
     }
+
+    return change;
 }
 
 //Move a single expression
-void cs6300::Motion::moveExpr(ExprNode* expr, std::pair<shared_ptr<BasicBlock>,shared_ptr<BasicBlock>> edge)
+bool cs6300::Motion::moveExpr(ExprNode* expr, std::pair<shared_ptr<BasicBlock>,shared_ptr<BasicBlock>> edge)
 {
-    if(!regs(expr).size()) return;
+    if(!regs(expr).size()) return false;
     auto tals = popTAL(expr);
-    if(!tals.size()) return;
+    if(!tals.size()) return false;
     auto newBlock = std::make_shared<cs6300::BasicBlock>();
     //TODO: make work with branchTo
     edge.first->jumpTo = newBlock;
     newBlock->jumpTo = edge.second;
 
     std::copy(tals.begin(), tals.end(), std::back_inserter(newBlock->instructions));
+    return true;
 }
 
 std::vector<cs6300::ThreeAddressInstruction> cs6300::Motion::popTAL(ExprNode* node)
@@ -180,7 +186,7 @@ cs6300::ExprNode* cs6300::Motion::getExpr(int reg)
 {
     if(!nmap.count(reg))
     {
-        std::cerr << "error getting " << reg << std::endl;
+        //std::cerr << "error getting " << reg << std::endl;
         nmap[reg] = new ExprNode("__" + to_string(reg) + "__");
     }
     return nmap[reg];
@@ -190,7 +196,7 @@ cs6300::ExprNode* cs6300::Motion::getExpr(std::string reg)
 {
     if(!smap.count(reg))
     {
-        std::cerr << "error getting " << reg << std::endl;
+        //std::cerr << "error getting " << reg << std::endl;
         smap[reg] = new ExprNode("__" + reg + "__");
     }
     return smap[reg];

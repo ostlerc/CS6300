@@ -1,14 +1,15 @@
-VAR i : integer;
+VAR i,b : integer;
 
 BEGIN
 
 i := 8;
+b := 4;
 
-if (i < 12) then 
+if (i < 4*3) then
   write(i, " is less than 12");
 end;
 
-if (i > 12) then 
+if (i > 4*3) then
   write(i, " is greater than 12");
 end;
 
