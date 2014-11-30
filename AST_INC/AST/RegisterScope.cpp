@@ -61,7 +61,7 @@ bool cs6300::Motion::optimize(std::pair<std::shared_ptr<BasicBlock>, std::shared
             std::pair<shared_ptr<BasicBlock>, shared_ptr<BasicBlock>> edge = {bb, bb->jumpTo};
             for(auto&expr : latest.first)
             {
-                if(m.moveExpr(expr, edge))
+                if(m.moveExpr(expr, edge, true))
                     change = true;
             }
         }
@@ -70,7 +70,7 @@ bool cs6300::Motion::optimize(std::pair<std::shared_ptr<BasicBlock>, std::shared
             std::pair<shared_ptr<BasicBlock>, shared_ptr<BasicBlock>> edge = {bb, bb->branchTo};
             for(auto&expr : latest.second)
             {
-                if(m.moveExpr(expr, edge))
+                if(m.moveExpr(expr, edge, false))
                     change = true;
             }
         }
@@ -80,15 +80,22 @@ bool cs6300::Motion::optimize(std::pair<std::shared_ptr<BasicBlock>, std::shared
 }
 
 //Move a single expression
-bool cs6300::Motion::moveExpr(ExprNode* expr, std::pair<shared_ptr<BasicBlock>,shared_ptr<BasicBlock>> edge)
+bool cs6300::Motion::moveExpr(ExprNode* expr, std::pair<shared_ptr<BasicBlock>,shared_ptr<BasicBlock>> edge, bool isJump)
 {
     if(!regs(expr).size()) return false;
     auto tals = popTAL(expr);
     if(!tals.size()) return false;
     auto newBlock = std::make_shared<cs6300::BasicBlock>();
-    //TODO: make work with branchTo
-    edge.first->jumpTo = newBlock;
-    newBlock->jumpTo = edge.second;
+    if(isJump)
+    {
+        edge.first->jumpTo = newBlock;
+        newBlock->jumpTo = edge.second;
+    }
+    else
+    {
+        edge.first->branchTo = newBlock;
+        newBlock->branchTo = edge.second;
+    }
 
     std::copy(tals.begin(), tals.end(), std::back_inserter(newBlock->instructions));
     return true;
