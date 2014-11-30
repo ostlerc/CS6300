@@ -16,7 +16,6 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
     {
         bb->DEcalc(m);
         bb->UEcalc(m);
-        bb->Killcalc(m);
         cout << endl << bb->getLabel() << endl;
         bb->mset.printall();
     }

@@ -32,10 +32,10 @@ struct RegisterScope
 template <class T>
 void printset(std::string name, std::set<T> s)
 {
-    std::cout << name << ": ";
+    std::cout << name << ": [";
     for(auto&i : s)
-        std::cout << i << " ";
-    std::cout << std::endl;
+        std::cout << i << ", ";
+    std::cout << "]" << std::endl;
 }
 std::set<std::shared_ptr<cs6300::BasicBlock>> allBlocks(
         std::pair<std::shared_ptr<cs6300::BasicBlock>,

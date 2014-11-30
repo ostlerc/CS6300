@@ -146,10 +146,44 @@ void cs6300::BasicBlock::DEcalc(Motion _m)
 
 void cs6300::BasicBlock::UEcalc(Motion _m)
 {
-}
+    mset.UE.clear();
+    std::set<ExprNode*> computed;
+    for (auto it = instructions.begin(); it != instructions.end(); it++)
+    {
+        auto i = *it;
+        switch(i.op) {
+            case ThreeAddressInstruction::Stop: continue;
+        }
 
-void cs6300::BasicBlock::Killcalc(Motion _m)
-{
+        auto e = _m.getExpr(i);
+        if(!e) { std::cerr << "skipping null expr for instruction: '" << i << "'" << __LINE__ << std::endl; continue; }
+
+        bool computing = true;
+        switch (i.op) {
+            case ThreeAddressInstruction::LoadValue: // LoadValue has constants
+                mset.UE.insert(_m.nmap[i.dest]);
+                break;
+            case ThreeAddressInstruction::LoadMemory:
+                computing = false;
+            default:
+                bool argsComputed = false;
+                for(auto& v : computed)
+                {
+                    if(v->recurse().count(e))
+                    {
+                        argsComputed = true;
+                        break;
+                    }
+                }
+
+                if(!argsComputed)
+                    mset.UE.insert(e);
+
+                if(computing)
+                    computed.insert(e);
+                break;
+        }
+    }
 }
 
 bool cs6300::BasicBlock::Avocalc(Motion _m)

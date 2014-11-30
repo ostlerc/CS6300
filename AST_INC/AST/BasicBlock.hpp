@@ -35,7 +35,6 @@ public:
   //Code motion functions
   void DEcalc(Motion);
   void UEcalc(Motion);
-  void Killcalc(Motion);
   bool Avocalc(Motion);
   bool Avicalc(Motion);
   bool Anocalc(Motion);
