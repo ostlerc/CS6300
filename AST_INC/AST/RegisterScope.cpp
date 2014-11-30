@@ -39,21 +39,77 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
         }
     } while(change);
 
-    for (auto&& bb : allBlocks(graph))
-    {
-        cout << endl << bb->getLabel() << endl;
-        bb->mset.printall();
-        auto latest = bb->LatestCalc();
-        printset("jumpTo",latest.first);
-        printset("branchTo",latest.second);
-    }
-
     return m;
 }
 
 void cs6300::Motion::optimize(std::pair<std::shared_ptr<BasicBlock>, std::shared_ptr<BasicBlock>> graph)
 {
-    init(graph);
+    auto m = init(graph); //calculate all the required data sets
+
+    for (auto&& bb : allBlocks(graph))
+    {
+        auto latest = bb->LatestCalc();
+        cout << endl << bb->getLabel() << endl;
+        bb->mset.printall();
+
+        printset("jumpTo",latest.first);
+        printset("branchTo",latest.second);
+
+        if(bb->jumpTo)
+        {
+            std::pair<shared_ptr<BasicBlock>, shared_ptr<BasicBlock>> edge = {bb, bb->jumpTo};
+            for(auto&expr : latest.first)
+            {
+                m.moveExpr(expr, edge);
+            }
+        }
+        if(bb->branchTo)
+        {
+            std::pair<shared_ptr<BasicBlock>, shared_ptr<BasicBlock>> edge = {bb, bb->branchTo};
+            for(auto&expr : latest.second)
+            {
+                m.moveExpr(expr, edge);
+            }
+        }
+    }
+}
+
+//Move a single expression
+void cs6300::Motion::moveExpr(ExprNode* expr, std::pair<shared_ptr<BasicBlock>,shared_ptr<BasicBlock>> edge)
+{
+    if(!regs(expr).size()) return;
+    auto tals = popTAL(expr);
+    if(!tals.size()) return;
+    auto newBlock = std::make_shared<cs6300::BasicBlock>();
+    //TODO: make work with branchTo
+    edge.first->jumpTo = newBlock;
+    newBlock->jumpTo = edge.second;
+
+    std::copy(tals.begin(), tals.end(), std::back_inserter(newBlock->instructions));
+}
+
+std::vector<cs6300::ThreeAddressInstruction> cs6300::Motion::popTAL(ExprNode* node)
+{
+    std::set<int> nodes = regs(node);
+    std::vector<cs6300::ThreeAddressInstruction> res;
+
+    for (auto& bb : allBlocks(graph))
+    {
+        for (auto i = bb->instructions.begin(); i != bb->instructions.end(); )
+        {
+            auto at = *i;
+            //copy and delete
+            if(nodes.count(at.dest))
+            {
+                res.push_back(ThreeAddressInstruction(at.op,at.dest,at.src1,at.src2));
+                i = bb->instructions.erase(i);
+            }
+            else {
+                i++;
+            }
+        }
+    }
+    return res;
 }
 
 void cs6300::Motion::printmap()
@@ -94,9 +150,8 @@ void cs6300::Motion::mapInstr(ThreeAddressInstruction tal)
         case ThreeAddressInstruction::LoadMemory:
             nmap[tal.dest] = createExpr(to_string(tal.src2) + "($" + to_string(tal.src1) + ")");
             break;
+        case ThreeAddressInstruction::LoadValue:
         case ThreeAddressInstruction::LoadMemoryOffset:
-            break;
-        case ThreeAddressInstruction::LoadValue: // LoadValue has constants
             nmap[tal.dest] = createExpr(to_string(tal.src1));
             break;
         case ThreeAddressInstruction::StoreMemory: // special case store memory dest is src1
@@ -198,13 +253,16 @@ cs6300::ExprNode* cs6300::Motion::createExpr(int reg1, int reg2, int op)
     return ret;
 }
 
-cs6300::ExprNode* cs6300::ExprNode::find(std::string key)
+std::set<int> cs6300::Motion::regs(ExprNode* node)
 {
-    for(auto&&n : nodes)
-        if(n->key == key)
-            return n;
+    std::set<int> ret;
+    for(auto&v : nmap)
+    {
+        if(v.second->recurse().count(node))
+            ret.insert(v.first);
+    }
 
-    return NULL;
+    return ret;
 }
 
 std::set<cs6300::ExprNode*> cs6300::ExprNode::recurse()

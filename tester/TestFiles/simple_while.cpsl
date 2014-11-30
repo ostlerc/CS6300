@@ -5,7 +5,7 @@ BEGIN
 a := 5;
 x := 0;
 
-while x < a + 3 do
+while x < a * 3 do
   x := succ(x);
   write(x);
 end;

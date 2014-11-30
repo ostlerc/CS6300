@@ -6,6 +6,7 @@
 #include <string>
 #include <memory>
 #include <iostream>
+#include <vector>
 
 namespace cs6300
 {
@@ -46,7 +47,6 @@ struct ExprNode
     ExprNode(std::string key) : key(key) {}
     std::string key;
     std::set<ExprNode*> nodes;
-    ExprNode* find(std::string);
     std::set<ExprNode*> recurse();
 
 };
@@ -74,6 +74,9 @@ struct Motion
     std::map<std::string, ExprNode*> smap;
 
     std::pair<std::shared_ptr<BasicBlock>,std::shared_ptr<BasicBlock>> graph;
+    std::set<int> regs(ExprNode*);
+    void moveExpr(ExprNode*, std::pair<std::shared_ptr<BasicBlock>,std::shared_ptr<BasicBlock>>);
+    std::vector<cs6300::ThreeAddressInstruction> popTAL(ExprNode* node);
 
     static void optimize(std::pair<std::shared_ptr<BasicBlock>,
             std::shared_ptr<BasicBlock>>);
