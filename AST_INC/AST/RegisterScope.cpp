@@ -204,7 +204,10 @@ std::set<cs6300::ExprNode*> cs6300::ExprNode::recurse()
 {
     std::set<ExprNode*> all = { this };
     for(auto&&i : nodes)
-        join(all, i->recurse());
+    {
+        auto exprs = i->recurse();
+        all.insert(exprs.begin(), exprs.end());
+    }
     return all;
 }
 

@@ -169,7 +169,8 @@ void cs6300::BasicBlock::DEcalc(Motion _m)
                 {
                     if(!mset.Kill.count(e))
                         mset.DE.insert(e);
-                    join(mset.Kill, e->recurse());
+                    auto exprs = e->recurse();
+                    mset.Kill.insert(exprs.begin(), exprs.end());
                 }
                 break;
             default:

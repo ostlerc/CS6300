@@ -75,13 +75,6 @@ struct MotionSet
 
 std::ostream& operator<<(std::ostream&, ExprNode*);
 
-template<class T>
-void join(std::set<T>& dst, const std::set<T>& src)
-{
-    for(auto&&i : src)
-        dst.insert(i);
-}
-
 struct Motion
 {
     std::map<int,ExprNode*> nmap;
