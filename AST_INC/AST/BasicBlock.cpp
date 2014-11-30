@@ -111,26 +111,33 @@ void cs6300::BasicBlock::remap(std::map<int, int> m)
 
 void cs6300::BasicBlock::DEcalc(Motion _m)
 {
-    std::set<ExprNode*> killed;
+    mset.DE.clear();
+    mset.Kill.clear();
     for (auto it = instructions.rbegin(); it != instructions.rend(); it++)
     {
         auto i = *it;
+        switch(i.op) {
+            case ThreeAddressInstruction::Stop: continue;
+        }
+
         auto e = _m.getExpr(i);
         if(!e) { std::cerr << "skipping null expr for instruction: '" << i << "'" << std::endl; continue; }
-        switch (i.op)
-        {
+
+        switch (i.op) {
             case ThreeAddressInstruction::LoadMemory:
                 break;
             case ThreeAddressInstruction::LoadValue: // LoadValue has constants
                 mset.DE.insert(_m.nmap[i.dest]);
                 break;
             case ThreeAddressInstruction::StoreMemory: // special case store memory dest is src1
-                if(!killed.count(e))
-                    mset.DE.insert(e);
-                join(killed, e->recurse());
+                {
+                    if(!mset.Kill.count(e))
+                        mset.DE.insert(e);
+                    join(mset.Kill, e->recurse());
+                }
                 break;
             default:
-                if(!killed.count(e))
+                if(!mset.Kill.count(e))
                     mset.DE.insert(e);
                 break;
         }

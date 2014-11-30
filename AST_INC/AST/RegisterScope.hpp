@@ -55,6 +55,7 @@ struct MotionSet
 {
     std::set<ExprNode*> DE; // downwardly exposed
     std::set<ExprNode*> UE; // upwardly exposed
+    std::set<ExprNode*> Kill; // upwardly exposed
     std::set<ExprNode*> Avo; // available out
     std::set<ExprNode*> Avi; // available in
     std::set<ExprNode*> Ano; // anticipatible out
@@ -64,6 +65,7 @@ struct MotionSet
     {
         printset("DE", DE);
         printset("UE", UE);
+        printset("Kill", Kill);
         printset("Avo", Avo);
         printset("Avi", Avi);
         printset("Ano", Ano);
@@ -74,7 +76,7 @@ struct MotionSet
 std::ostream& operator<<(std::ostream&, ExprNode*);
 
 template<class T>
-void join(std::set<T> dst, std::set<T> src)
+void join(std::set<T>& dst, const std::set<T>& src)
 {
     for(auto&&i : src)
         dst.insert(i);

@@ -17,7 +17,7 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
         bb->DEcalc(m);
         bb->UEcalc(m);
         bb->Killcalc(m);
-        cout << bb->getLabel() << endl;
+        cout << endl << bb->getLabel() << endl;
         bb->mset.printall();
     }
 
@@ -83,12 +83,15 @@ void cs6300::Motion::mapInstr(ThreeAddressInstruction tal)
             nmap[tal.dest] = createExpr(to_string(tal.src1));
             break;
         case ThreeAddressInstruction::StoreMemory: // special case store memory dest is src1
-            nmap[tal.dest]->nodes.insert(createExpr(to_string(tal.src2) + "($" + to_string(tal.src1) + ")"));
+            {
+                auto e = createExpr(to_string(tal.src2) + "($" + to_string(tal.src1) + ")");
+                e->nodes.insert(nmap[tal.dest]);
+            }
             break;
         case ThreeAddressInstruction::AddValue:
             {
                 auto rhs = createExpr(to_string(tal.src2));
-                auto lhs = createExpr("$"+to_string(tal.src1));
+                auto lhs = getExpr(tal.src1);
                 std::string key = "("+lhs->key + ThreeAddressInstruction::opstr(tal.op) + rhs->key+")";
                 auto e = createExpr(key);
                 lhs->nodes.insert(e);

@@ -151,9 +151,9 @@ std::string cs6300::ThreeAddressInstruction::opstr(int op)
     switch(op)
     {
         case Add:
-            return "Add";
+            return "+";
         case AddValue:
-            return "AddValue";
+            return "+";
         case And:
             return "&&";
         case CallFunction:
