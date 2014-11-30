@@ -141,7 +141,7 @@ void cs6300::BasicBlock::InitMotion(Motion _m)
     //anticipatible in  = UE + (ANTOUT - KILL)
     std::set_difference(mset.Ano.begin(), mset.Ano.end(),
                         mset.Kill.begin(), mset.Kill.end(),
-                        std::inserter(mset.Ani, mset.Ani.end())); //(AVIN - KILL)
+                        std::inserter(mset.Ano, mset.Ano.end())); //(AVOUT - KILL)
     mset.Ani.insert(mset.UE.begin(), mset.UE.end()); //UE + ^
 }
 
@@ -161,9 +161,9 @@ void cs6300::BasicBlock::DEcalc(Motion _m)
 
         switch (i.op) {
             case ThreeAddressInstruction::LoadMemory:
-                break;
-            case ThreeAddressInstruction::LoadValue: // LoadValue has constants
                 mset.DE.insert(_m.nmap[i.dest]);
+            case ThreeAddressInstruction::LoadValue: // LoadValue has constants
+                //mset.DE.insert(_m.nmap[i.dest]);
                 break;
             case ThreeAddressInstruction::StoreMemory: // special case store memory dest is src1
                 {
@@ -198,7 +198,7 @@ void cs6300::BasicBlock::UEcalc(Motion _m)
         bool computing = true;
         switch (i.op) {
             case ThreeAddressInstruction::LoadValue: // LoadValue has constants
-                mset.UE.insert(_m.nmap[i.dest]);
+                //mset.UE.insert(_m.nmap[i.dest]);
                 break;
             case ThreeAddressInstruction::LoadMemory:
                 computing = false;
@@ -243,9 +243,12 @@ bool cs6300::BasicBlock::Avcalc(Motion _m)
             continue;
         }
 
+        std::set<ExprNode*> t;
         std::set_intersection(mset.Avi.begin(), mset.Avi.end(),
                               p->mset.Avo.begin(), p->mset.Avo.end(),
-                              std::inserter(mset.Avi, mset.Avi.end()));
+                              std::inserter(t, t.end()));
+        mset.Avi.clear();
+        mset.Avi.insert(t.begin(),t.end());
     }
 
     //out: DE + (IN - KILL)
@@ -262,24 +265,34 @@ bool cs6300::BasicBlock::Ancalc(Motion _m)
     int o = mset.Ano.size();
 
     mset.Ano.clear();
-    mset.Ani.clear();
 
     bool init = true;
 
     //out: intersection of parents in
-    for(auto&p : parents)
+    std::set<std::shared_ptr<BasicBlock>> children;
+    if(jumpTo)
+        children.insert(jumpTo);
+    if(branchTo)
+        children.insert(branchTo);
+    std::cout << getLabel() << "-" << children.size() << " children" << std::endl;
+    for(auto&c : children)
     {
         if(init)
         {
-            mset.Ano.insert(p->mset.Ani.begin(), p->mset.Ani.end());
+            mset.Ano.insert(c->mset.Ani.begin(), c->mset.Ani.end());
             init = false;
             continue;
         }
 
+        std::set<ExprNode*> t;
         std::set_intersection(mset.Ano.begin(), mset.Ano.end(),
-                p->mset.Ani.begin(), p->mset.Ani.end(),
-                std::inserter(mset.Ano, mset.Ano.end()));
+                c->mset.Ani.begin(), c->mset.Ani.end(),
+                std::inserter(t, t.end()));
+        mset.Ano.clear();
+        mset.Ano.insert(t.begin(),t.end());
     }
+
+    mset.Ani.clear();
 
     //in: UE + (OUT - KILL)
     std::set_difference(mset.Ano.begin(), mset.Ano.end(),
@@ -287,6 +300,19 @@ bool cs6300::BasicBlock::Ancalc(Motion _m)
             std::inserter(mset.Ani, mset.Ani.end())); //(OUT - KILL)
     mset.Ani.insert(mset.UE.begin(), mset.UE.end()); //UE + ^
     return o != mset.Ano.size() || i != mset.Ani.size();
+}
+
+std::pair<std::set<cs6300::ExprNode*>, std::set<cs6300::ExprNode*>>
+cs6300::BasicBlock::LatestCalc()
+{
+    auto ret = std::pair<std::set<ExprNode*>, std::set<ExprNode*>>();
+
+    if(jumpTo)
+        ret.first = mset.latest(this->mset, jumpTo->mset, !parents.size());
+    if(branchTo)
+        ret.second = mset.latest(this->mset, branchTo->mset, !parents.size());
+
+    return ret;
 }
 
 std::ostream& cs6300::operator<<(std::ostream& out,

@@ -38,6 +38,8 @@ public:
   void UEcalc(Motion);
   bool Avcalc(Motion);
   bool Ancalc(Motion);
+  std::pair<std::set<ExprNode*>, std::set<ExprNode*>>
+      LatestCalc();
 
 private:
   std::string label;

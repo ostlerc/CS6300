@@ -61,16 +61,9 @@ struct MotionSet
     std::set<ExprNode*> Ano; // anticipatible out
     std::set<ExprNode*> Ani; // anticipatible in
 
-    void printall()
-    {
-        printset("DE", DE);
-        printset("UE", UE);
-        printset("Kill", Kill);
-        printset("Avi", Avi);
-        printset("Avo", Avo);
-        printset("Ani", Ani);
-        printset("Ano", Ano);
-    }
+    void printall();
+
+    std::set<ExprNode*> latest(MotionSet, MotionSet, bool entry = false);
 };
 
 std::ostream& operator<<(std::ostream&, ExprNode*);

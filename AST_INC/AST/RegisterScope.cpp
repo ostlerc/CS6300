@@ -1,7 +1,11 @@
 #include "RegisterScope.hpp"
 #include "BasicBlock.hpp"
 #include "ThreeAddressInstruction.hpp"
+
 #include <vector>
+#include <algorithm>
+#include <set>
+#include <iterator>
 
 using namespace std;
 
@@ -39,6 +43,9 @@ cs6300::Motion cs6300::Motion::init(std::pair<std::shared_ptr<BasicBlock>, std::
     {
         cout << endl << bb->getLabel() << endl;
         bb->mset.printall();
+        auto latest = bb->LatestCalc();
+        printset("jumpTo",latest.first);
+        printset("branchTo",latest.second);
     }
 
     return m;
@@ -209,6 +216,43 @@ std::set<cs6300::ExprNode*> cs6300::ExprNode::recurse()
         all.insert(exprs.begin(), exprs.end());
     }
     return all;
+}
+
+std::set<cs6300::ExprNode*> cs6300::MotionSet::latest(MotionSet m1, MotionSet m2, bool entry)
+{
+    auto ret = std::set<ExprNode*>();
+    auto rhs = std::set<ExprNode*>();
+    auto lhs = std::set<ExprNode*>();
+
+    //Latest(i,j) = ANTIN(j) - AVAILOUT(i) ^ (Kill(i) - ANTOUT(i))
+
+    std::set_difference(m2.Ani.begin(), m2.Ani.end(),
+            m1.Avo.begin(), m1.Avo.end(),
+            std::inserter(lhs, lhs.end())); //lhs = ANTIN(j) - AVAILOUT(i)
+
+    if(entry) //entry block only uses lhs
+        return lhs;
+
+    std::set_difference(m1.Kill.begin(), m1.Kill.end(),
+            m1.Ano.begin(), m1.Ano.end(),
+            std::inserter(rhs, rhs.end())); //lhs = Kill(i) - ANTOUT(i)
+
+    std::set_intersection(lhs.begin(), lhs.end(),
+            rhs.begin(), rhs.end(),
+            std::inserter(ret, ret.end())); //lhs = Kill(i) - ANTOUT(i)
+
+    return ret;
+}
+
+void cs6300::MotionSet::printall()
+{
+    printset("DE", DE);
+    printset("UE", UE);
+    printset("Kill", Kill);
+    printset("Avi", Avi);
+    printset("Avo", Avo);
+    printset("Ani", Ani);
+    printset("Ano", Ano);
 }
 
 std::ostream& cs6300::operator<<(std::ostream& out, ExprNode* e)
