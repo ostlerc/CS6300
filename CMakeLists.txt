@@ -17,11 +17,9 @@ ADD_FLEX_BISON_DEPENDENCY(CpslScanner CpslParser)
 enable_testing()
 
 include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR} 
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/AST_INC
-    ${gtest_SOURCE_DIR}/include
-    ${gtest_SOURCE_DIR}
     ${WINDOWS_GNU}
     )
 
@@ -29,8 +27,9 @@ set(EXTRA_COMPILE_FLAGS "-g -std=c++0x")
 set(LCOV_FLAGS "--coverage")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILE_FLAGS} ${LCOV_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LCOV_FLAGS}")
-set(cpsl_srcs main.cpp)
-source_group("" FILES ${cpsl_srcs})
+
+set(main_srcs main.cpp)
+source_group("Main" FILES ${cpsl_srcs})
 
 set(frontend_srcs
 FrontEnd/FrontEnd.hpp
@@ -41,7 +40,7 @@ ${BISON_CpslParser_OUTPUTS}
 ${FLEX_CpslScanner_OUTPUTS}
 )
 source_group("FrontEnd" FILES ${frontend_srcs})
-list(APPEND cpsl_srcs ${frontend_srcs})
+set(cpsl_srcs ${frontend_srcs})
 
 set(ast_srcs
   AST_INC/AST/BasicBlock.cpp
@@ -171,10 +170,25 @@ source_group("Optimizations" FILES ${optimization_srcs})
 list(APPEND cpsl_srcs ${optimization_srcs})
 
 file(GLOB unittests Testing/UnitTests/*.cpp)
-list(APPEND cpsl_srcs ${unittests})
+set(test_srcs ${unittests}
+    Testing/main.cpp
+    ${BISON_CpslParser_OUTPUTS}
+    ${FLEX_CpslScanner_OUTPUTS}
+    )
 
-add_executable(cpsl ${cpsl_srcs})
 
-target_link_libraries(cpsl ${FLEX_LIBRARIES} ${BISON_LIBRARIES} gtest)
+set(CMAKE_INSTALL_RPATH ".")
+add_library(cpsl_common SHARED ${cpsl_srcs})
 
-add_test(NAME runUnitTests COMMAND cpsl -test)
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set_target_properties(cpsl_common PROPERTIES MACOSX_RPATH "@loader_path/../lib")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+add_executable(cpsl ${main_srcs})
+add_executable(cpsl_test ${test_srcs})
+
+target_link_libraries(cpsl_common ${FLEX_LIBRARIES} ${BISON_LIBRARIES})
+target_link_libraries(cpsl cpsl_common)
+target_link_libraries(cpsl_test cpsl_common)
+
+add_test(UnitTests cpsl_test)

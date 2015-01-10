@@ -3,7 +3,6 @@
 #include "FrontEnd/FrontEnd.hpp"
 #include "Optimizations/Optimizer.hpp"
 #include "BackEnd/BackEnd.hpp"
-#include "gtest/gtest.h"
 
 int main(int argc, char* argv[])
 {
@@ -12,13 +11,11 @@ int main(int argc, char* argv[])
     std::string outFile = "out.asm";
     std::string inFile = "in.cpsl";
 
-    if (argc < 2) return EXIT_FAILURE;
-    if(argv[1] == std::string("-test"))
+    if (argc < 2)
     {
-      ::testing::InitGoogleTest(&argc, argv);
-      return RUN_ALL_TESTS();
+        return EXIT_FAILURE;
     }
-    else if (argv[1] == std::string("-o"))
+    if (argv[1] == std::string("-o"))
     {
       outFile = argv[2];
       inFile = argv[3];
@@ -41,7 +38,7 @@ int main(int argc, char* argv[])
   }
   catch (std::exception& e)
   {
-    std::cout << "Error: " << e.what();
+    std::cerr << "Error: " << e.what();
     return EXIT_FAILURE;
   }
   catch (...)
