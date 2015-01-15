@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+
 #include "FrontEnd/FrontEnd.hpp"
 #include "Optimizations/Optimizer.hpp"
 #include "BackEnd/BackEnd.hpp"
@@ -25,16 +26,7 @@ int main(int argc, char* argv[])
       inFile = argv[1];
     }
 
-    auto program = cs6300::parseCPSL(inFile);
-    auto optimized = cs6300::optimizer(program);
-    auto intermediate =
-      std::make_shared<cs6300::IntermediateRepresentationProgram>(optimized);
-    intermediate->main = cs6300::optimizer(intermediate->main);
-    for (auto&& f : intermediate->functions)
-    {
-      f.second = cs6300::optimizer(f.second);
-    }
-    cs6300::writeMIPS(intermediate, outFile);
+    cs6300::compileCPSL(inFile, outFile);
   }
   catch (std::exception& e)
   {
